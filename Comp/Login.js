@@ -6,50 +6,68 @@ export default class Login extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      userName: 'Enter Here',
+      username: 'Enter Here',
       password: 'Password',
       message: '',
+      data: ''
     }
   }
 
-  bark(e){
+  componentDidMount() {
     fetch('http://localhost:5000/api/userId')
       .then((results) => {
         return results.json()
-      }).then((data) => {
-        console.log(data, "bananas")
-        for(let i = 0; i < data.length; i++) {
-          if(data[i].username === this.state.userName && data[i].password === this.state.password) {
-            this.props.navigation.navigate('MyPage', {
-              userName: this.state.userName,
-              password: this.state.password
-            })
-          } else {
-            this.setState({message: 'Incorrect login information.', password: ''})
-          }
-        }
+      })
+      .then((data) => {
+        let userData = data;
+        this.setState({
+          data: userData,
+        })
       })
   }
 
+  bark(e) {
+    for(let i = 0; i < this.state.data.length; i++) {
+      if(this.state.data[i].username === this.state.username
+        && this.state.data[i].password === this.state.password) {
+        this.props.navigation.navigate('MyPage', {
+          username: this.state.username,
+          password: this.state.password
+        })
+      } else {
+        this.setState({
+          message: 'Incorrect login information.',
+          password: ''
+        })
+      }
+    }
+  }
+
   render() {
-    console.log('console log works!');
     return(
       <View>
         <Text>Username:</Text>
         <TextInput
-          onChangeText={(userName) => this.setState({userName: userName})}
-          value={this.state.userName}
+          onChangeText={(username) => this.setState({username: username})}
+          value={this.state.username}
+          autoCapitalize = 'none'
         />
         <Text>Password: </Text>
         <TextInput
           onChangeText={(password) => this.setState({password: password})}
           value={this.state.password}
+          autoCapitalize = 'none'
         />
         <Text>{this.state.message}
         </Text>
         <Button
           title="Submit"
           onPress={(e) => this.bark(e)}
+        />
+        <Text>Don't have an account? Make one </Text>
+        <Button
+          title="here!"
+          onPress = {()=>{this.props.navigation.navigate('CreateUser')}}
         />
       </View>
     )

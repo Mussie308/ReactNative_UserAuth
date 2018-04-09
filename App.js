@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { StackNavigator } from 'react-navigation';
 import Login from './Comp/Login.js';
 import MyPage from './Comp/MyPage.js';
+import CreateUser from './Comp/CreateUser.js';
 
 const RootStack =
   StackNavigator({
@@ -13,7 +14,11 @@ const RootStack =
     MyPage: {
       name: "MyPage",
       screen: MyPage,
-    }
+    },
+    CreateUser: {
+      name: "CreateUser",
+      screen: CreateUser,
+    },
   },
   {initialRouteName: 'Login'}
 )
@@ -26,7 +31,7 @@ export default class App extends React.Component {
       password:"",
     }
   }
-  
+
   render() {
     return (
       <View style={styles.container}>
