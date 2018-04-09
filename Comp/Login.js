@@ -8,16 +8,31 @@ export default class Login extends React.Component {
     this.state = {
       userName: 'Enter Here',
       password: 'Password',
+      message: '',
     }
   }
+
   bark(e){
-    this.props.navigation.navigate('MyPage', {
-      userName: this.state.userName,
-      password: this.state.password
-    })
+    fetch('http://localhost:5000/api/userId')
+      .then((results) => {
+        return results.json()
+      }).then((data) => {
+        console.log(data, "bananas")
+        for(let i = 0; i < data.length; i++) {
+          if(data[i].username === this.state.userName && data[i].password === this.state.password) {
+            this.props.navigation.navigate('MyPage', {
+              userName: this.state.userName,
+              password: this.state.password
+            })
+          } else {
+            this.setState({message: 'Incorrect login information.', password: ''})
+          }
+        }
+      })
   }
 
   render() {
+    console.log('console log works!');
     return(
       <View>
         <Text>Username:</Text>
@@ -30,6 +45,8 @@ export default class Login extends React.Component {
           onChangeText={(password) => this.setState({password: password})}
           value={this.state.password}
         />
+        <Text>{this.state.message}
+        </Text>
         <Button
           title="Submit"
           onPress={(e) => this.bark(e)}
