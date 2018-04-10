@@ -6,16 +6,40 @@ export default class CreateUser extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      username: 'username',
-      password: 'password',
-      checkPassword: 'Confirm Password',
+      username: 'enter here',
+      checkUserName: 'hi',
+      password: 'enter here',
+      checkPassword: 'enter here',
       message: '',
     }
   }
 
-  meow(e){
+  componentDidMount() {
+    fetch('http://localhost:5000/api/userId')
+      .then((results) => {
+        return results.json()
+      })
+      .then((data) => {
+        let userData = data.map((value) => value.username);
+        this.setState({
+          data: userData,
+        })
+      })
+  }
+
+  meow(e) {
     e.preventDefault();
-    if(this.state.password === this.state.checkPassword){
+    for(let i = 0; i < this.state.data.length; i++) {
+      console.log(this.state.data[i] + " " + this.state.username);
+      if(this.state.username == this.state.data[i]) {
+        this.setState({
+          checkUserName: 'That username is already taken!'
+        })
+      }
+      console.log(this.state.checkUserName);
+    }
+    if(this.state.password === this.state.checkPassword
+      && this.state.checkUserName === '') {
       fetch('http://localhost:5000/api/userId', {
         method: 'POST',
         headers: {
@@ -27,6 +51,7 @@ export default class CreateUser extends React.Component {
           password: this.state.password
         })
       })
+      this.props.navigation.navigate('Login');
     } else {
       this.setState({
         message:"Password doesn't match!"
@@ -54,6 +79,10 @@ export default class CreateUser extends React.Component {
         onChangeText={(password) => this.setState({checkPassword: password})}
         value={this.state.checkPassword}
         autoCapitalize = 'none'
+      />
+      <Button
+        title="Submit"
+        onPress={(e) => this.meow(e)}
       />
       <Text>{this.state.message}</Text>
       </View>

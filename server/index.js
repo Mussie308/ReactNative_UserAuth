@@ -42,6 +42,7 @@ router.route('/userId')
     });
   });
 
+
 app.use('/api', router);
 app.listen(port);
 console.log(`magic happens on port ${port}`);

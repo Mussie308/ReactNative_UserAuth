@@ -24,14 +24,6 @@ const RootStack =
 )
 
 export default class App extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      userName:"",
-      password:"",
-    }
-  }
-
   render() {
     return (
       <View style={styles.container}>
