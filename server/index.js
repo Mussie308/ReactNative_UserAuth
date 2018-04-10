@@ -8,6 +8,8 @@ const port = process.env.PORT || 5000;
 const app = express();
 const UserSchema = require('./models/UserSchema.js');
 const router = express.Router();
+const middleRouter = express.Router();
+
 
 mongoose.connect('mongodb://localhost/user-auth');
 
@@ -19,9 +21,34 @@ router.use((req, res, next) => {
   next();
 });
 
+middleRouter.use((req, res, next) => {
+    return UserSchema.findOne({username: req.body.username}, (userErr, username) => {
+      console.log(userErr, username);
+      if (userErr || username) {
+        return res.status(401).end();
+      }
+      // pass user details onto next route
+      // req.username = username
+      console.log()
+      return next();
+    });
+  });
+
 router.get('/', (req, res) => {
   res.json({message: 'yay our database works'});
 });
+
+middleRouter.route('/')
+  .post((req, res) => {
+    const userId = new UserSchema();
+    userId.username = req.body.username;
+    userId.password = req.body.password;
+    userId.save(err => {
+      if(err)
+        res.send(err);
+      res.json({message: 'new secure user!'});
+    });
+  })
 
 router.route('/userId')
   .post((req, res) => {
@@ -43,6 +70,9 @@ router.route('/userId')
   });
 
 
+
 app.use('/api', router);
+app.use('/hogsmeade', middleRouter);
+
 app.listen(port);
 console.log(`magic happens on port ${port}`);

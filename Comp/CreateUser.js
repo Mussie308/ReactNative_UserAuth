@@ -7,40 +7,16 @@ export default class CreateUser extends React.Component {
     super(props)
     this.state = {
       username: 'enter here',
-      checkUserName: 'hi',
       password: 'enter here',
       checkPassword: 'enter here',
       message: '',
     }
   }
 
-  componentDidMount() {
-    fetch('http://localhost:5000/api/userId')
-      .then((results) => {
-        return results.json()
-      })
-      .then((data) => {
-        let userData = data.map((value) => value.username);
-        this.setState({
-          data: userData,
-        })
-      })
-  }
-
   meow(e) {
     e.preventDefault();
-    for(let i = 0; i < this.state.data.length; i++) {
-      console.log(this.state.data[i] + " " + this.state.username);
-      if(this.state.username == this.state.data[i]) {
-        this.setState({
-          checkUserName: 'That username is already taken!'
-        })
-      }
-      console.log(this.state.checkUserName);
-    }
-    if(this.state.password === this.state.checkPassword
-      && this.state.checkUserName === '') {
-      fetch('http://localhost:5000/api/userId', {
+    if(this.state.password === this.state.checkPassword) {
+      fetch('http://localhost:5000/hogsmeade', {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -50,6 +26,14 @@ export default class CreateUser extends React.Component {
           username: this.state.username,
           password: this.state.password
         })
+      })
+      .then((res) => {
+        console.log(res)
+        return res;
+      })
+      .catch((err) => {
+        console.log(err)
+        return err;
       })
       this.props.navigation.navigate('Login');
     } else {
@@ -62,7 +46,7 @@ export default class CreateUser extends React.Component {
   render() {
     return(
       <View>
-      <Text>Username:</Text>
+      <Text>Username: </Text>
       <TextInput
         onChangeText={(username) => this.setState({username: username})}
         value={this.state.username}
