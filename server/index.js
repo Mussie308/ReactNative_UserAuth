@@ -21,19 +21,12 @@ router.use((req, res, next) => {
   next();
 });
 
-let authBoolean = true;
 
 middleRouter.use((req, res, next) => {
     return UserSchema.findOne({username: req.body.username}, (userErr, username) => {
-      console.log(userErr, username);
       if (userErr || username) {
-        authBoolean = false;
-        return res.status(401).end();
-        //return next();
+        return res.status(401).send('Something broke!')
       }
-      // pass user details onto next route
-      // req.username = username
-      console.log()
       return next();
     });
   });
@@ -42,19 +35,18 @@ router.get('/', (req, res) => {
   res.json({message: 'yay our database works'});
 });
 
-if(authBoolean === true) {
 middleRouter.route('/')
   .post((req, res) => {
-    const userId = new UserSchema();
-    userId.username = req.body.username;
-    userId.password = req.body.password;
-    userId.save(err => {
-      if(err)
-        res.send(err);
-      res.json({message: 'new secure user!'});
-    });
+    console.log(req + " " + res);
+      const userId = new UserSchema();
+      userId.username = req.body.username;
+      userId.password = req.body.password;
+      userId.save(err => {
+        if(err)
+          res.send(err);
+        res.json({message: 'new secure user!'});
+      });
   })
-  }
 
 router.route('/userId')
   .post((req, res) => {

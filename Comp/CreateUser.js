@@ -28,14 +28,18 @@ export default class CreateUser extends React.Component {
         })
       })
       .then((res) => {
-        console.log(res)
+        if(res.status != 401){
+          this.props.navigation.navigate('Login');
+        }else{
+          this.setState({message:"User already exists!"})
+        }
         return res;
       })
       .catch((err) => {
         console.log(err)
         return err;
       })
-      this.props.navigation.navigate('Login');
+      // this.props.navigation.navigate('Login');
     } else {
       this.setState({
         message:"Password doesn't match!"
