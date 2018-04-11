@@ -8,39 +8,38 @@ export default class Login extends React.Component {
     this.state = {
       username: 'Enter Here',
       password: 'Password',
-      message: '',
-      data: ''
+      message: ''
     }
-  }
-
-  componentDidMount() {
-    fetch('http://localhost:5000/api/userId')
-      .then((results) => {
-        return results.json()
-      })
-      .then((data) => {
-        let userData = data;
-        this.setState({
-          data: userData,
-        })
-      })
   }
 
   bark(e) {
-    for(let i = 0; i < this.state.data.length; i++) {
-      if(this.state.data[i].username === this.state.username
-        && this.state.data[i].password === this.state.password) {
+    fetch('http://localhost:5000/userAuth', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: this.state.username,
+        password: this.state.password
+      })
+    })
+    .then((res) => {
+      if(res.status != 401) {
         this.props.navigation.navigate('MyPage', {
-          username: this.state.username,
-          password: this.state.password
+          username: this.state.username
         })
       } else {
         this.setState({
-          message: 'Incorrect login information.',
-          password: ''
+          message: 'Incorrect user information!'
         })
       }
-    }
+      return res;
+    })
+    .catch((err) => {
+      console.log(err)
+      return err;
+    })
   }
 
   render() {

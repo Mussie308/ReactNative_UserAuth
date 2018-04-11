@@ -7,8 +7,8 @@ const port = process.env.PORT || 5000;
 
 const app = express();
 const UserSchema = require('./models/UserSchema.js');
-const router = express.Router();
-const middleRouter = express.Router();
+const userAuthRouter = express.Router();
+const createUserRouter = express.Router();
 
 
 mongoose.connect('mongodb://localhost/user-auth');
@@ -16,13 +16,23 @@ mongoose.connect('mongodb://localhost/user-auth');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-router.use((req, res, next) => {
+userAuthRouter.use((req, res, next) => {
   console.log('something is happening');
-  next();
+  return UserSchema.findOne({
+    username: req.body.username,
+    password: req.body.password
+  },
+  (userErr, username) => {
+    if(userErr || !username) {
+      return res.status(401).send('Incorrect Login information')
+    }
+    return next();
+  })
 });
 
 
-middleRouter.use((req, res, next) => {
+createUserRouter.use((req, res, next) => {
+    console.log('something is happening');
     return UserSchema.findOne({username: req.body.username}, (userErr, username) => {
       if (userErr || username) {
         return res.status(401).send('Something broke!')
@@ -31,13 +41,8 @@ middleRouter.use((req, res, next) => {
     });
   });
 
-router.get('/', (req, res) => {
-  res.json({message: 'yay our database works'});
-});
-
-middleRouter.route('/')
+createUserRouter.route('/')
   .post((req, res) => {
-    console.log(req + " " + res);
       const userId = new UserSchema();
       userId.username = req.body.username;
       userId.password = req.body.password;
@@ -48,29 +53,19 @@ middleRouter.route('/')
       });
   })
 
-router.route('/userId')
+userAuthRouter.route('/')
   .post((req, res) => {
-    const userId = new UserSchema();
-    userId.username = req.body.username;
-    userId.password = req.body.password;
-    userId.save(err => {
+    UserSchema.findOne({username: req.body.username}, (err, userId) => {
       if(err)
         res.send(err);
-      res.json({message: 'new user!'});
-    });
-  })
-  .get((req, res) => {
-    UserSchema.find((err, userId) => {
-      if(err)
-        res.send(err);
-      res.json(userId);
+      res.json(userId.username);
     });
   });
 
 
 
-app.use('/api', router);
-app.use('/hogsmeade', middleRouter);
+app.use('/userAuth', userAuthRouter);
+app.use('/createUser', createUserRouter);
 
 app.listen(port);
 console.log(`magic happens on port ${port}`);

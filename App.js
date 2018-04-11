@@ -24,6 +24,8 @@ const RootStack =
 )
 
 export default class App extends React.Component {
+  //this.state({username:"Harry" || "", isLogged:true || false})
+  //basic login setup thing
   render() {
     return (
       <View style={styles.container}>
